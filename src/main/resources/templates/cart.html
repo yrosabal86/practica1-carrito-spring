@@ -8,6 +8,11 @@
 <body class="container mt-4">
     <h1>Mi carrito</h1>
 
+    <div class="alert alert-warning" th:if="${removedNames != null and !removedNames.isEmpty()}">
+        Se quitaron del carrito productos que ya no están disponibles:
+        <strong th:text="${#strings.listJoin(removedNames, ', ')}"></strong>.
+    </div>
+
     <p th:if="${items.isEmpty()}">El carrito está vacío.</p>
 
     <table class="table" th:unless="${items.isEmpty()}">

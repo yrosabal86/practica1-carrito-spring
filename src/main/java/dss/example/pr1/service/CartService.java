@@ -6,6 +6,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Service
 @SessionScope
@@ -18,10 +19,25 @@ public class CartService {
     }
 
     public void removeItem(Long id) {
-        items.stream()
-             .filter(p -> p.getId().equals(id))
-             .findFirst()
-             .ifPresent(items::remove);
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId().equals(id)) {
+                items.remove(i);
+                break;
+            }
+        }
+    }
+
+    public List<Product> removeIf(Predicate<Product> condition) {
+        List<Product> removed = new ArrayList<>();
+
+        for (Product product : items) {
+            if (condition.test(product)) {
+                removed.add(product);
+            }
+        }
+
+        items.removeIf(condition);
+        return removed;
     }
 
     public List<Product> getItems() {
@@ -29,6 +45,12 @@ public class CartService {
     }
 
     public double getTotal() {
-        return items.stream().mapToDouble(Product::getPrice).sum();
+        double total = 0;
+
+        for (Product product : items) {
+            total += product.getPrice();
+        }
+
+        return total;
     }
 }
