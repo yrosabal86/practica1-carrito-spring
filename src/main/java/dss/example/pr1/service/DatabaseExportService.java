@@ -42,9 +42,10 @@ public class DatabaseExportService {
     private String literal(String texto) {
 
         if (texto == null) {
-            return "''";
+            return "NULL";
         }
 
+        // En SQL, una comilla simple dentro de un texto se representa duplicándola.
         return "'" + texto.replace("'", "''") + "'";
     }
 }

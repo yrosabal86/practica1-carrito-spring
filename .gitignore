@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Imágenes subidas en ejecución ###
+uploads/
+.metadata/
+.metadata/

@@ -1,6 +1,5 @@
 package dss.example.pr1.controller;
 
-import dss.example.pr1.model.Product;
 import dss.example.pr1.service.DatabaseExportService;
 import dss.example.pr1.service.ProductService;
 import org.springframework.http.HttpHeaders;
@@ -23,18 +22,18 @@ public class AdminController {
         this.exportService = exportService;
     }
 
-    @GetMapping
+    @GetMapping({"", "/"})
     public String adminPanel(Model model) {
         model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("product", new Product());
         return "admin";
     }
 
-    @GetMapping("/export")
+    // Funciona con /admin/export y también con /admin/export/
+    @GetMapping({"/export", "/export/"})
     public ResponseEntity<byte[]> exportSql() {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products.sql")
-                .contentType(MediaType.TEXT_PLAIN)
+                .contentType(new MediaType("text", "plain", java.nio.charset.StandardCharsets.UTF_8))
                 .body(exportService.exportDatabaseToSql());
     }
 }

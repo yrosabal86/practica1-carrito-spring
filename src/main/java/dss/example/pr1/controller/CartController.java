@@ -25,15 +25,13 @@ public class CartController {
         this.productService = productService;
     }
 
-    @GetMapping
+    // Ver el carrito (quita los productos eliminados del catálogo y avisa al usuario)
+    @GetMapping({"", "/"})
     public String viewCart(Model model) {
-
         List<Product> removed = cartService.removeIf(
-                product -> productService.getProductById(product.getId()) == null
-        );
+                product -> productService.getProductById(product.getId()) == null);
 
         List<String> removedNames = new ArrayList<>();
-
         for (Product product : removed) {
             if (!removedNames.contains(product.getName())) {
                 removedNames.add(product.getName());
@@ -41,21 +39,16 @@ public class CartController {
         }
 
         model.addAttribute("removedNames", removedNames);
-        model.addAttribute("items", cartService.getItems());
-        model.addAttribute("total", cartService.getTotal());
-
+        model.addAttribute("cartItems", cartService.getItems());
         return "cart";
     }
 
     @PostMapping("/add/{id}")
     public String addToCart(@PathVariable Long id) {
-
         Product product = productService.getProductById(id);
-
         if (product != null) {
             cartService.addItem(product);
         }
-
         return "redirect:/cart";
     }
 

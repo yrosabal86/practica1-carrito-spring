@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" th:href="@{/}">
+            <img src="https://img.icons8.com/ios-filled/50/000000/home.png"
+                 alt="Inicio" width="30" height="30">
+        </a>
+
+        <!-- Cerrar sesión (cualquier usuario autenticado) -->
+        <form th:action="@{/logout}" method="post" class="ms-auto"
+              sec:authorize="isAuthenticated()">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                Cerrar sesión
+            </button>
+        </form>
+    </nav>
+
+    <h1 class="text-center my-5">Catálogo de Productos</h1>
+
+    <!-- Acciones generales -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a th:href="@{/cart}" class="btn btn-secondary">
+            Ver Carrito
+        </a>
+
+        <!-- Solo administradores -->
+        <a th:href="@{/products/add}"
+           sec:authorize="hasRole('ADMIN')"
+           class="btn btn-success">
+            Añadir Producto
+        </a>
+
+        <a th:href="@{/admin/export}"
+           sec:authorize="hasRole('ADMIN')"
+           class="btn btn-outline-primary">
+            Exportar catálogo (SQL)
+        </a>
+    </div>
+
+    <!-- Catálogo -->
+    <div class="row">
+        <div th:each="product : ${products}" class="col-md-4">
+            <div class="card mb-4">
+                <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}" th:src="@{${product.imageUrl}}"
+                     class="card-img-top" alt="imagen del producto"
+                     style="height:200px;object-fit:cover;">
+                <div class="card-body">
+
+                    <h5 class="card-title"
+                        th:text="${product.name}">
+                        Nombre del Producto
+                    </h5>
+
+                    <p class="card-text">
+                        Precio:
+                        <span th:text="${product.price}">
+                            0.00
+                        </span> €
+                    </p>
+
+                    <!-- Carrito -->
+                    <form th:action="@{/cart/add/{id}(id=${product.id})}"
+                          method="post"
+                          class="mb-2">
+
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Agregar al Carrito
+                        </button>
+                    </form>
+
+                    <!-- Operaciones exclusivas de ADMIN -->
+                    <div sec:authorize="hasRole('ADMIN')"
+                         class="d-flex gap-2">
+
+                        <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                           class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+
+                        <form th:action="@{/products/delete/{id}(id=${product.id})}"
+                              method="post"
+                              onsubmit="return confirm('¿Eliminar este producto del catálogo?');">
+
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm">
+                                Eliminar
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(products)}"
+         class="alert alert-info">
+        No hay productos disponibles en el catálogo.
+    </div>
+
+</div>
+</body>
+</html>
